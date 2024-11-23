@@ -1,147 +1,134 @@
-import { Button } from "@/components/ui/button"
-import {
-    Card,
-    CardContent,
-    CardDescription,
-    CardFooter,
-    CardHeader,
-    CardTitle,
-} from "@/components/ui/card"
-import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
-import {
-    Tabs,
-    TabsContent,
-    TabsList,
-    TabsTrigger,
-} from "@/components/ui/tabs"
-import { useLoginUserMutation, useRegisterUserMutation } from "@/features/api/authApi"
-import { Loader2 } from "lucide-react"
-import { useState } from "react"
+import React, { useEffect, useState } from 'react';
+import { useLoginUserMutation, useRegisterUserMutation } from '../features/api/authApi.js';
+import { toast } from 'react-toastify';
 
 const Login = () => {
-    const [registerForm, setRegisterForm] = useState({
-        name: "",
-        email: "",
-        password: "",
-    });
     const [loginForm, setLoginForm] = useState({
-        email: "",
-        password: "",
+        email: '',
+        password: '',
     });
 
-    const [registerUser, { data, isError, isSuccess, isLoading }] = useRegisterUserMutation();
-    const [loginUser, { data: loginData, isError: loginError, isSuccess: loginSuccess, isLoading: loginLoading }] = useLoginUserMutation();
+    const [registerForm, setRegisterForm] = useState({
+        name: '',
+        email: '',
+        password: '',
+    });
 
-    // Handle input changes
+    // RTK Query Hooks
+    const [registerUser, { data: registerData, error: registerError, isSuccess: registerSuccess, isLoading: registerLoading }] = useRegisterUserMutation();
+    const [loginUser, { data: loginData, error: loginError, isSuccess: loginSuccess, isLoading: loginLoading }] = useLoginUserMutation();
+
     const handleChange = (e, type) => {
-        const { name, value } = e.target;
-        if (type === "signup") {
-            setRegisterForm((prev) => ({ ...prev, [name]: value }));
-        } else if (type === "login") {
-            setLoginForm((prev) => ({ ...prev, [name]: value }));
+        const { id, value } = e.target;
+        if (type === 'signup') {
+            setRegisterForm((prev) => ({ ...prev, [id]: value }));
+        } else if (type === 'login') {
+            setLoginForm((prev) => ({ ...prev, [id]: value }));
         }
     };
 
-    // Handle form submission
-    const fromSubmit = async (type) => {
-        const formData = type === "signup" ? registerForm : loginForm;
+    const formSubmit = (type) => {
+        const formData = type === 'signup' ? registerForm : loginForm;
         const action = type === 'signup' ? registerUser : loginUser;
-        await action(formData);
+        action(formData);
     };
 
+    // Handle Notifications
+    useEffect(() => {
+        if (loginError) {
+            toast.error(loginError?.data?.message || 'Login Failed');
+        }
+        if (loginSuccess) {
+            toast.success(loginData?.message || 'Login Successfully');
+        }
+    }, [loginError, loginData, loginSuccess]);
+
+    useEffect(() => {
+        if (registerError) {
+            toast.error(registerError?.data?.message || 'Registration Failed');
+        }
+        if (registerSuccess) {
+            toast.success(registerData?.message || 'Registered Successfully');
+        }
+    }, [registerError, registerData, registerSuccess]);
+
     return (
-        <div className="pt-40 h-full flex items-center justify-center flex-col">
-            <Tabs defaultValue="account" className="w-[400px]">
-                <TabsList className="grid w-full grid-cols-2">
-                    <TabsTrigger value="signup">Signup</TabsTrigger>
-                    <TabsTrigger value="login">Login</TabsTrigger>
-                </TabsList>
-                <TabsContent value="signup">
-                    <Card>
-                        <CardHeader>
-                            <CardTitle>Signup</CardTitle>
-                            <CardDescription>Create Your Account</CardDescription>
-                        </CardHeader>
-                        <CardContent className="space-y-2">
-                            <div className="space-y-1">
-                                <Label htmlFor="name">Name</Label>
-                                <Input
-                                    id="name"
-                                    name="name"
-                                    value={registerForm.name}
-                                    onChange={(e) => handleChange(e, "signup")}
-                                />
+        <div className="container">
+            <div className="row justify-content-center vh-100 align-items-center">
+                <div className="col-md-6">
+                    <div className="card rounded-4">
+                        <div className="card-body">
+                            <ul className="nav nav-pills nav-fill gap-2" id="pills-tab" role="tablist">
+                                <li className="nav-item" role="presentation">
+                                    <button className="nav-link active text-center border rounded-3" id="pills-signup-tab" data-bs-toggle="pill" data-bs-target="#pills-signup" type="button" role="tab" aria-controls="pills-signup" aria-selected="true">Signup</button>
+                                </li>
+                                <li className="nav-item" role="presentation">
+                                    <button className="nav-link text-center border rounded-3" id="pills-login-tab" data-bs-toggle="pill" data-bs-target="#pills-login" type="button" role="tab" aria-controls="pills-login" aria-selected="false">Login</button>
+                                </li>
+                            </ul>
+                            <div className="tab-content py-3" id="myTabContent">
+                                {/* Signup Form */}
+                                <div className="tab-pane fade show active" id="pills-signup" role="tabpanel" aria-labelledby="pills-signup-tab" tabIndex="0">
+                                    <h1 className="fs-4 text-center">Signup Your Account</h1>
+                                    <div className="row g-3">
+                                        <div className="col-md-12">
+                                            <label htmlFor="name" className="form-label">Name</label>
+                                            <input type="text" id="name" value={registerForm.name} onChange={(e) => handleChange(e, 'signup')} className="form-control" />
+                                        </div>
+                                        <div className="col-md-12">
+                                            <label htmlFor="signupEmail" className="form-label">Email</label>
+                                            <input type="email" id="email" value={registerForm.email} onChange={(e) => handleChange(e, 'signup')} className="form-control" />
+                                        </div>
+                                        <div className="col-md-12">
+                                            <label htmlFor="signupPassword" className="form-label">Password</label>
+                                            <input type="password" id="password" value={registerForm.password} onChange={(e) => handleChange(e, 'signup')} className="form-control" />
+                                        </div>
+                                        <div className="col-12">
+                                            <button onClick={() => formSubmit('signup')} className="btn btn-primary" type="button" disabled={registerLoading}>
+                                                {registerLoading ? (
+                                                    <>
+                                                        <span className="spinner-border spinner-border-sm" aria-hidden="true"></span>
+                                                        <span role="status">Loading...</span>
+                                                    </>
+                                                ) : (
+                                                    'Signup'
+                                                )}
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                {/* Login Form */}
+                                <div className="tab-pane fade" id="pills-login" role="tabpanel" aria-labelledby="pills-login-tab" tabIndex="0">
+                                    <h1 className="fs-4 text-center">Login Your Account</h1>
+                                    <div className="row g-3">
+                                        <div className="col-md-12">
+                                            <label htmlFor="loginEmail" className="form-label">Email</label>
+                                            <input type="email" id="email" value={loginForm.email} onChange={(e) => handleChange(e, 'login')} className="form-control" />
+                                        </div>
+                                        <div className="col-md-12">
+                                            <label htmlFor="loginPassword" className="form-label">Password</label>
+                                            <input type="password" id="password" value={loginForm.password} onChange={(e) => handleChange(e, 'login')} className="form-control" />
+                                        </div>
+                                        <div className="col-12">
+                                            <button onClick={() => formSubmit('login')} className="btn btn-primary" type="button" disabled={loginLoading}>
+                                                {loginLoading ? (
+                                                    <>
+                                                        <span className="spinner-border spinner-border-sm" aria-hidden="true"></span>
+                                                        <span role="status">Loading...</span>
+                                                    </>
+                                                ) : (
+                                                    'Login'
+                                                )}
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
                             </div>
-                            <div className="space-y-1">
-                                <Label htmlFor="email">Email</Label>
-                                <Input
-                                    id="email"
-                                    name="email"
-                                    value={registerForm.email}
-                                    onChange={(e) => handleChange(e, "signup")}
-                                />
-                            </div>
-                            <div className="space-y-1">
-                                <Label htmlFor="password">Password</Label>
-                                <Input
-                                    id="password"
-                                    name="password"
-                                    type="password"
-                                    value={registerForm.password}
-                                    onChange={(e) => handleChange(e, "signup")}
-                                />
-                            </div>
-                        </CardContent>
-                        <CardFooter>
-                            <Button onClick={() => fromSubmit("signup")}>
-                                {
-                                    isLoading ? <><Loader2 className="mr-2 w-4 h-4 animate-spin" />Please Wait..</> : "Register"
-                                }
-                            </Button>
-                        </CardFooter>
-                    </Card>
-                </TabsContent>
-                <TabsContent value="login">
-                    <Card>
-                        <CardHeader>
-                            <CardTitle>Login</CardTitle>
-                            <CardDescription>Login With Your Account</CardDescription>
-                        </CardHeader>
-                        <CardContent className="space-y-2">
-                            <div className="space-y-1">
-                                <Label htmlFor="email">Email</Label>
-                                <Input
-                                    id="email"
-                                    name="email"
-                                    type="email"
-                                    value={loginForm.email}
-                                    onChange={(e) => handleChange(e, "login")}
-                                />
-                            </div>
-                            <div className="space-y-1">
-                                <Label htmlFor="password">Password</Label>
-                                <Input
-                                    id="password"
-                                    name="password"
-                                    type="password"
-                                    value={loginForm.password}
-                                    onChange={(e) => handleChange(e, "login")}
-                                />
-                            </div>
-                        </CardContent>
-                        <CardFooter>
-                            <Button disabled={loginLoading} onClick={() => fromSubmit("login")}>
-                                {
-                                    loginLoading ? <>
-                                        <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                                    </> : 'Login'
-                                }
-                            </Button>
-                        </CardFooter>
-                    </Card>
-                </TabsContent>
-            </Tabs>
+                        </div>
+                    </div>
+                </div>
+            </div>
         </div>
     );
 };

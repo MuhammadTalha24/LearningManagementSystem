@@ -6,7 +6,7 @@ import { userLoggedIn } from '../authSlice'
 export const authApi = createApi({
     reducerPath: "authApi",
     baseQuery: fetchBaseQuery({
-        baseUrl: "http://localhost:4000/api/user",
+        baseUrl: "http://localhost:4000/api/user/",
         credentials: "include",
     }),
     endpoints: (builder) => ({
@@ -26,11 +26,12 @@ export const authApi = createApi({
             async onQueryStarted(arg, { queryFulfilled, dispatch }) {
                 try {
                     const result = await queryFulfilled;
-                    dispatch(userLoggedIn({ user: result.data.user }))
+                    dispatch(userLoggedIn({ user: result.data.user }));
                 } catch (error) {
-                    console.log(error)
+                    console.error("Login failed:", error);
                 }
             }
+
         })
     })
 })
