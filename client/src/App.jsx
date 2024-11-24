@@ -5,6 +5,10 @@ import Home from './pages/Home'
 import Navbar from './components/Navbar'
 import MyLearning from './pages/student/MyLearning'
 import Profile from './pages/student/Profile'
+import Dashboard from './pages/admin/Dashboard'
+import Sidebar from './pages/admin/Sidebar'
+import Courses from './pages/admin/courses/Courses'
+import AddCourses from './pages/admin/courses/AddCourses'
 
 
 const App = () => {
@@ -16,6 +20,11 @@ const App = () => {
         <Route path='/' element={<Home />}></Route>
         <Route path='/my-learning' element={<MyLearning />}></Route>
         <Route path='/profile' element={<Profile />} ></Route>
+        <Route path='/admin' element={<Sidebar />}>
+          <Route path='dashboard' element={<Dashboard />}></Route>
+          <Route path='courses' element={<Courses />}></Route>
+          <Route path='courses/create' element={<AddCourses />}></Route>
+        </Route>
       </Routes>
 
     </>

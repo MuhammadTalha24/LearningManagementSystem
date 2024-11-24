@@ -4,6 +4,7 @@ import userRoutes from './routes/user.routes.js'
 import cookieParser from 'cookie-parser'
 import cors from 'cors'
 import env from 'dotenv';
+import courseRoutes from './routes/course.routes.js'
 
 env.config();
 const app = express()
@@ -20,6 +21,7 @@ app.use(cors({
 
 
 app.use('/api/user', userRoutes);
+app.use('/api/course', courseRoutes);
 
 dbConnection().then(() => {
     app.listen(process.env.PORT, () => {
