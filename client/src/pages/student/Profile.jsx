@@ -1,8 +1,18 @@
-import { useGetProfileQuery } from "../../features/api/authApi";
+import { useState } from "react";
+import { useGetProfileQuery, useUpdateProfileMutation } from "../../features/api/authApi";
 
 
 const Profile = () => {
+    const [name, setName] = useState('');
+    const [profilePhoto, setProfilePhoto] = useState('');
     const { data, isLoading } = useGetProfileQuery();
+    const [updateProfile, { data: updateProfileData, isLoading: updateProfileisLoading, isSuccess: updateProfileisSuccess }] = useUpdateProfileMutation();
+
+    const onChangeHandler = (e) => {
+        const file = e.target.files?.[0];
+        if (file) setProfilePhoto(file);
+    }
+
 
     if (isLoading) return <h1 className="text-center py-5">Profile Loading..</h1>
 
@@ -12,6 +22,12 @@ const Profile = () => {
     }
 
     const user = data.user;
+
+
+    const updateProfileHandler = () => {
+
+        console.log(name, profilePhoto)
+    }
 
     return (
         <>
@@ -63,15 +79,15 @@ const Profile = () => {
                         <div className="modal-body">
                             <div className="d-flex align-items-center mb-3 justify-content-between">
                                 <label className='w-25' htmlFor="name">Name</label>
-                                <input type="text" className='form-control' />
+                                <input type="text" value={name} onChange={(e) => setName(e.target.value)} className='form-control' />
                             </div>
                             <div className="d-flex align-items-center mb-3 justify-content-between">
                                 <label className='w-25' htmlFor="profile">Profile</label>
-                                <input type="file" accept='image/*' className='form-control' />
+                                <input type="file" onChange={onChangeHandler} accept='image/*' className='form-control' />
                             </div>
                         </div>
                         <div className="modal-footer">
-                            <button type="button" className="btn btn-primary">Save changes</button>
+                            <button type="button" className="btn btn-primary" onClick={updateProfileHandler}>Save changes</button>
                         </div>
                     </div>
                 </div>
