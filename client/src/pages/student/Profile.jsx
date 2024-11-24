@@ -5,7 +5,7 @@ import { toast } from "react-toastify";
 const Profile = () => {
     const [name, setName] = useState("");
     const [profilePhoto, setProfilePhoto] = useState("");
-    const { data, isLoading } = useGetProfileQuery(); // Always call hooks at the top
+    const { data, isLoading, refetch } = useGetProfileQuery(); // Always call hooks at the top
     const [updateProfile, { data: updateProfileData, isLoading: updateProfileisLoading, isSuccess: updateProfileisSuccess, isError }] =
         useUpdateProfileMutation();
 
@@ -21,9 +21,15 @@ const Profile = () => {
         await updateProfile(formdata);
     };
 
+
+    useEffect(() => {
+        refetch();
+    }, [])
     useEffect(() => {
         if (updateProfileisSuccess) {
+            refetch()
             toast.success(updateProfileData?.message || "Profile Updated Successfully");
+
         }
         if (isError) {
             toast.error("Failed To Update Profile");
@@ -51,7 +57,7 @@ const Profile = () => {
                         <div className="card mt-3">
                             <div className="card-body py-3">
                                 <div className="d-flex align-items-start gap-3">
-                                    <div className="rounded-circle bg-primary" style={{ width: "100px", height: "100px" }}>
+                                    <div className="rounded-circle overflow-hidden" style={{ width: "100px", height: "100px" }}>
                                         <img src={user.profile_image || ""} className="img-fluid object-fit-cover" alt="Profile" />
                                     </div>
                                     <div className="d-flex flex-column">
@@ -115,19 +121,13 @@ const Profile = () => {
                             </div>
                         </div>
                         <div className="modal-footer">
-                            <button
-                                type="button"
-                                className="btn btn-primary"
-                                onClick={updateProfileHandler}
-                                disabled={updateProfileisLoading}
-                            >
-                                {updateProfileisLoading ? (
-                                    <div className="spinner-border" role="status">
-                                        <span className="visually-hidden">Please Wait...</span>
-                                    </div>
-                                ) : (
-                                    "Save changes"
-                                )}
+
+                            <button onClick={updateProfileHandler}
+                                disabled={updateProfileisLoading} class="btn btn-primary" type="button">
+                                {
+                                    updateProfileisLoading ? <><span class="spinner-border spinner-border-sm" aria-hidden="true"></span>  <span role="status">Save Changes</span></> : <span role="status">Save Changes</span>
+                                }
+
                             </button>
 
                         </div>

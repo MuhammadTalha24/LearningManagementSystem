@@ -1,5 +1,5 @@
 import { createApi, fetchBaseQuery } from '@reduxjs/toolkit/query/react'
-import { userLoggedIn } from '../authSlice'
+import { userLoggedIn, userloggedOut } from '../authSlice'
 
 
 
@@ -33,11 +33,32 @@ export const authApi = createApi({
             }
 
         }),
+        logoutUser: builder.mutation({
+            query: () => ({
+                url: 'logout',
+                method: "GET",
+            }),
+            onQueryStarted(arg, { queryFulfilled, dispatch }) {
+                try {
+                    dispatch(userloggedOut());
+                } catch (error) {
+                    console.log(error)
+                }
+            }
+        }),
         getProfile: builder.query({
             query: () => ({
                 url: "profile",
                 method: 'GET',
-            })
+            }),
+            async onQueryStarted(arg, { queryFulfilled, dispatch }) {
+                try {
+                    const result = await queryFulfilled;
+                    dispatch(userLoggedIn({ user: result.data.user }));
+                } catch (error) {
+                    console.error("Login failed:", error);
+                }
+            }
         }),
         updateProfile: builder.mutation({
             query: (formData) => ({
@@ -52,6 +73,6 @@ export const authApi = createApi({
 })
 
 
-export const { useLoginUserMutation, useRegisterUserMutation, useGetProfileQuery, useUpdateProfileMutation } = authApi
+export const { useLoginUserMutation, useRegisterUserMutation, useGetProfileQuery, useUpdateProfileMutation, useLogoutUserMutation } = authApi
 
 

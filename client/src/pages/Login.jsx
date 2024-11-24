@@ -65,15 +65,15 @@ const Login = () => {
                         <div className="card-body">
                             <ul className="nav nav-pills nav-fill gap-2" id="pills-tab" role="tablist">
                                 <li className="nav-item" role="presentation">
-                                    <button className="nav-link active text-center border rounded-3" id="pills-signup-tab" data-bs-toggle="pill" data-bs-target="#pills-signup" type="button" role="tab" aria-controls="pills-signup" aria-selected="true">Signup</button>
+                                    <button className="nav-link text-center border rounded-3" id="pills-signup-tab" data-bs-toggle="pill" data-bs-target="#pills-signup" type="button" role="tab" aria-controls="pills-signup" aria-selected="true">Signup</button>
                                 </li>
                                 <li className="nav-item" role="presentation">
-                                    <button className="nav-link text-center border rounded-3" id="pills-login-tab" data-bs-toggle="pill" data-bs-target="#pills-login" type="button" role="tab" aria-controls="pills-login" aria-selected="false">Login</button>
+                                    <button className="nav-link active text-center border rounded-3" id="pills-login-tab" data-bs-toggle="pill" data-bs-target="#pills-login" type="button" role="tab" aria-controls="pills-login" aria-selected="false">Login</button>
                                 </li>
                             </ul>
                             <div className="tab-content py-3" id="myTabContent">
                                 {/* Signup Form */}
-                                <div className="tab-pane fade show active" id="pills-signup" role="tabpanel" aria-labelledby="pills-signup-tab" tabIndex="0">
+                                <div className="tab-pane fade " id="pills-signup" role="tabpanel" aria-labelledby="pills-signup-tab" tabIndex="0">
                                     <h1 className="fs-4 text-center">Signup Your Account</h1>
                                     <div className="row g-3">
                                         <div className="col-md-12">
@@ -104,7 +104,7 @@ const Login = () => {
                                 </div>
 
                                 {/* Login Form */}
-                                <div className="tab-pane fade" id="pills-login" role="tabpanel" aria-labelledby="pills-login-tab" tabIndex="0">
+                                <div className="tab-pane fade show active" id="pills-login" role="tabpanel" aria-labelledby="pills-login-tab" tabIndex="0">
                                     <h1 className="fs-4 text-center">Login Your Account</h1>
                                     <div className="row g-3">
                                         <div className="col-md-12">

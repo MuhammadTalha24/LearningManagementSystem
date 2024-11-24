@@ -9,4 +9,10 @@ const store = configureStore({
 })
 
 
+const initializeApp = async () => {
+    await store.dispatch(authApi.endpoints.getProfile.initiate({}, { forceRefetch: true }))
+}
+
+initializeApp();
 export default store;
+
