@@ -1,6 +1,8 @@
 import React, { useEffect, useState } from 'react';
 import { useLoginUserMutation, useRegisterUserMutation } from '../features/api/authApi.js';
 import { toast } from 'react-toastify';
+import { useNavigate } from 'react-router-dom'
+
 
 const Login = () => {
     const [loginForm, setLoginForm] = useState({
@@ -13,6 +15,8 @@ const Login = () => {
         email: '',
         password: '',
     });
+
+    const navigate = useNavigate()
 
     // RTK Query Hooks
     const [registerUser, { data: registerData, error: registerError, isSuccess: registerSuccess, isLoading: registerLoading }] = useRegisterUserMutation();
@@ -40,6 +44,7 @@ const Login = () => {
         }
         if (loginSuccess) {
             toast.success(loginData?.message || 'Login Successfully');
+            navigate('/')
         }
     }, [loginError, loginData, loginSuccess]);
 

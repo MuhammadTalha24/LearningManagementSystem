@@ -1,6 +1,7 @@
 import { User } from "../schema/user.model.js";
 import bcrypt from 'bcryptjs'
 import { generateToken } from "../utils/generateToken.js";
+import { deleteMediaFromCloudinary, mediaUpload } from "../utils/cloudinary.js";
 
 export const userRegister = async (req, res) => {
     try {
@@ -120,5 +121,51 @@ export const getUserProfile = async (req, res) => {
             message: "Internal Server Error"
         })
 
+    }
+}
+
+
+
+// User Update Profile
+export const updateProfile = async (req, res) => {
+    try {
+        const userId = req.id;
+        const { name } = req.body;
+        const profilePhoto = req.file;
+
+
+        const user = await User.findById(userId);
+        if (!user) {
+            return res.status(400).json({
+                message: "User Not Found",
+                success: false
+            })
+        }
+
+        //Extract The Public Id Of the Old Image From  url it is exists
+
+        if (user.profile_image) {
+            const publidId = user.profile_image.split("/").pop().split(".")[0]; //extract pulic id
+            deleteMediaFromCloudinary(publidId)
+        }
+
+
+        //upload new photo
+        const cloudResponse = await mediaUpload(profilePhoto.path);
+        const photoURL = cloudResponse.secure_url;
+        const updatedData = { name, photoURL }
+
+        const updatedUser = await User.findByIdAndUpdate(userId, updatedData, { new: true }).select("-password");
+
+        return res.status(200).json({
+            message: "Profile Updated Successfully",
+            success: true,
+            user: updatedUser
+        })
+    } catch (error) {
+        return res.status(500).json({
+            success: false,
+            message: "Internal Server Error"
+        })
     }
 }
