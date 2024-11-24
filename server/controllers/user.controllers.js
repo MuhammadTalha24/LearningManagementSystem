@@ -133,39 +133,47 @@ export const updateProfile = async (req, res) => {
         const { name } = req.body;
         const profilePhoto = req.file;
 
-
         const user = await User.findById(userId);
         if (!user) {
             return res.status(400).json({
                 message: "User Not Found",
-                success: false
-            })
+                success: false,
+            });
         }
 
-        //Extract The Public Id Of the Old Image From  url it is exists
-
+        // Extract public ID from old image URL and delete from Cloudinary
         if (user.profile_image) {
-            const publidId = user.profile_image.split("/").pop().split(".")[0]; //extract pulic id
-            deleteMediaFromCloudinary(publidId)
+            const publicId = user.profile_image.split("/").pop().split(".")[0];
+            if (publicId) {
+                await deleteMediaFromCloudinary(publicId);
+            }
         }
 
+        // Upload new profile photo
+        if (!profilePhoto) {
+            return res.status(400).json({
+                success: false,
+                message: "No profile photo provided",
+            });
+        }
 
-        //upload new photo
         const cloudResponse = await mediaUpload(profilePhoto.path);
         const photoURL = cloudResponse.secure_url;
-        const updatedData = { name, photoURL }
 
+        // Update user data
+        const updatedData = { name, profile_image: photoURL };
         const updatedUser = await User.findByIdAndUpdate(userId, updatedData, { new: true }).select("-password");
 
         return res.status(200).json({
             message: "Profile Updated Successfully",
             success: true,
-            user: updatedUser
-        })
+            user: updatedUser,
+        });
     } catch (error) {
+        console.error("Error updating profile:", error);
         return res.status(500).json({
             success: false,
-            message: "Internal Server Error"
-        })
+            message: "Internal Server Error",
+        });
     }
-}
+};
