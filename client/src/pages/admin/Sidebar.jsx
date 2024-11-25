@@ -11,10 +11,10 @@ const Sidebar = () => {
 
                 <ul className="nav flex-column">
                     <li className="nav-item">
-                        <Link className="nav-link text-white d-flex align-items-center gap-3" to={'/admin/dashboard'}><RxDashboard fontSize={25} />Dashboard</Link>
+                        <Link className="nav-link text-white d-flex align-items-center gap-3" to={'dashboard'}><RxDashboard fontSize={25} />Dashboard</Link>
                     </li>
                     <li className="nav-item">
-                        <Link className="nav-link text-white d-flex align-items-center gap-3" to={'/admin/courses'}><PiBookmarkSimple fontSize={25} />Courses</Link>
+                        <Link className="nav-link text-white d-flex align-items-center gap-3" to={'courses'}><PiBookmarkSimple fontSize={25} />Courses</Link>
                     </li>
 
 

@@ -1,17 +1,32 @@
-import React, { useState } from 'react'
-import { Navigate, useNavigate } from 'react-router-dom'
+import React, { useEffect, useState } from 'react'
+import { useNavigate } from 'react-router-dom'
+import { toast } from 'react-toastify'
+import { useCreateCourseMutation } from '../../../features/api/courseApi'
 const AddCourses = () => {
     const [courseTitle, setCourseTitle] = useState('')
     const [category, setCategory] = useState('')
     const navigate = useNavigate();
+    const [createCourse, { data, isSuccess, isError, error }] = useCreateCourseMutation()
+
 
     const createCourseHandler = async () => {
-        console.log(category, courseTitle)
+        await createCourse({ courseTitle, category })
     }
 
     const getSelectedCategory = (e) => {
         setCategory(e.target.value)
     }
+
+    useEffect(() => {
+        if (isSuccess) {
+            toast.success(data.message || 'Course Created');
+            navigate('/admin/courses');
+
+        }
+        if (isError) {
+            toast.error(error?.data?.message || "Error in Course Creation");
+        }
+    }, [isError, isSuccess, error]);
 
     return (
         <div className="container">

@@ -1,7 +1,7 @@
 import { combineReducers } from "@reduxjs/toolkit";
 import { authApi } from "@/features/api/authApi";
 import authReducer from '@/features/authSlice.js'
-import { courseApi } from '../features/api/courseApi.js';
+import { courseApi } from "../features/api/courseApi";
 
 
 

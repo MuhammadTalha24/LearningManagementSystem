@@ -9,6 +9,7 @@ import Dashboard from './pages/admin/Dashboard'
 import Sidebar from './pages/admin/Sidebar'
 import Courses from './pages/admin/courses/Courses'
 import AddCourses from './pages/admin/courses/AddCourses'
+import EditCourse from './pages/admin/courses/EditCourse'
 
 
 const App = () => {
@@ -24,6 +25,7 @@ const App = () => {
           <Route path='dashboard' element={<Dashboard />}></Route>
           <Route path='courses' element={<Courses />}></Route>
           <Route path='courses/create' element={<AddCourses />}></Route>
+          <Route path='courses/:courseId' element={<EditCourse />}></Route>
         </Route>
       </Routes>
 
