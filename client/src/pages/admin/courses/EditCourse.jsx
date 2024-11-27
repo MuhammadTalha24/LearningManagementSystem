@@ -1,9 +1,13 @@
-import React, { useState } from 'react'
-import { Link, useNavigate } from 'react-router-dom'
+import React, { useState, useEffect } from 'react'
+import { Link, useNavigate, useParams } from 'react-router-dom'
 import TextEditor from '../../../components/TextEditor'
-import { Navigate } from 'react-router-dom'
+import { useEditCourseMutation } from '../../../features/api/courseApi'
+import { toast } from 'react-toastify'
+
 
 const EditCourse = () => {
+
+    const loading = false
     const [input, setInput] = useState({
         courseTitle: "",
         subTitle: "",
@@ -14,6 +18,8 @@ const EditCourse = () => {
         courseThumbnail: "",
     })
 
+    const params = useParams()
+    const courseId = params.courseId
     const [previewThumbnail, setpreviewThumbnail] = useState('')
 
     const navigate = useNavigate()
@@ -23,13 +29,14 @@ const EditCourse = () => {
 
     }
 
-    const handleCategoryChange = (value) => {
-        setInput({ ...input, category: value })
-    }
+    const handleCategoryChange = (e) => {
+        setInput({ ...input, category: e.target.value });
+    };
 
-    const handleCourseLevel = (value) => {
-        setInput({ ...input, courseLevel: value })
-    }
+    const handleCourseLevel = (e) => {
+        setInput({ ...input, courseLevel: e.target.value });
+    };
+
 
     const selectThumbnail = (e) => {
         const file = e.target.files?.[0];
@@ -40,6 +47,32 @@ const EditCourse = () => {
             reader.readAsDataURL(file);
         }
     }
+
+    const [editCourse, { data, error, isLoading, isSuccess }] = useEditCourseMutation()
+
+    const submitEditForm = async () => {
+        const formData = new FormData();
+
+        formData.append('courseTitle', input.courseTitle)
+        formData.append('subTitle', input.subTitle)
+        formData.append('category', input.category)
+        formData.append('courseLevel', input.courseLevel)
+        formData.append('coursePrice', input.coursePrice)
+        formData.append('description', input.description)
+        formData.append('courseThumbnail', input.courseThumbnail)
+
+        await editCourse({ formData, courseId })
+    }
+
+    useEffect(() => {
+        if (isSuccess) {
+            toast.success(data.messasge || 'Course Updated')
+        }
+        // if (error) {
+        //     toast.error(error.data.messasge || "Error")
+        // }
+
+    }, [isSuccess, error])
     return (
         <div className="container">
             <div className="row">
@@ -78,7 +111,7 @@ const EditCourse = () => {
                                 <div className="col-3">
                                     <div className="form-group mt-4 mb-3">
                                         <label htmlFor="category" name="category" className='form-label'>Category</label>
-                                        <select name="category" onChange={handleCategoryChange} className='form-select' placeholder='Select Category'>
+                                        <select name="category" value={input.category} onChange={handleCategoryChange} className='form-select' placeholder='Select Category'>
                                             <option value="Next Js">Next Js</option>
                                             <option value="Frontend Development">Frontend Development</option>
                                             <option value="Backend Development">Backend Development</option>
@@ -93,7 +126,7 @@ const EditCourse = () => {
                                 <div className="col-3">
                                     <div className="form-group mt-4 mb-3">
                                         <label htmlFor="category" name="courseLevel" className='form-label'>Course Level</label>
-                                        <select name="courseLevel" onChange={handleCourseLevel} className='form-select' placeholder='Select Category'>
+                                        <select name="courseLevel" value={input.courseLevel} onChange={handleCourseLevel} className='form-select' placeholder='Select Category'>
                                             <option value="Beginner">Beginner</option>
                                             <option value="Medium">Medium</option>
                                             <option value="Advanced">Advanced</option>
@@ -103,8 +136,8 @@ const EditCourse = () => {
                                 </div>
                                 <div className="col-3">
                                     <div className="form-group mt-4 mb-3">
-                                        <label htmlFor="category" onChange={handleChange} className='form-label'>Price in (PKR)</label>
-                                        <input type="number" className='form-control' name="coursePrice" id="" />
+                                        <label htmlFor="category" className='form-label'>Price in (PKR)</label>
+                                        <input type="number" onChange={handleChange} value={input.coursePrice} className='form-control' name="coursePrice" id="" />
                                     </div>
                                 </div>
                             </div>
@@ -114,16 +147,23 @@ const EditCourse = () => {
 
                                 {
                                     previewThumbnail && (
-                                        <img src={previewThumbnail} alt="preview image" className='rounded-3' style={{ width: "120px", height: '120px' }} />
+                                        <img src={previewThumbnail} alt="preview image" className='rounded-3 mt-4' style={{ width: "300px", height: '200px' }} />
                                     )
                                 }
                             </div>
                             <div>
                                 <button onClick={() => navigate('/admin/courses')} className='btn btn-danger'>Cancel</button>
-                                <button className='btn btn-primary ms-2'>
-                                    <span class="spinner-border spinner-border-sm" aria-hidden="true"></span>
-                                    <span role="status">Loading...</span>
+                                <button onClick={submitEditForm} className='btn btn-primary ms-2'>
+                                    {loading ? (
+                                        <>
+                                            <span className="spinner-border spinner-border-sm" aria-hidden="true"></span>
+                                            <span role="status" className="ms-2">Saving...</span>
+                                        </>
+                                    ) : (
+                                        "Save"
+                                    )}
                                 </button>
+
                             </div>
                         </div>
                     </div>
