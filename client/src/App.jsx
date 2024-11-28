@@ -10,6 +10,7 @@ import Sidebar from './pages/admin/Sidebar'
 import Courses from './pages/admin/courses/Courses'
 import AddCourses from './pages/admin/courses/AddCourses'
 import EditCourse from './pages/admin/courses/EditCourse'
+import AddLectures from './pages/admin/courses/AddLectures'
 
 
 const App = () => {
@@ -26,6 +27,7 @@ const App = () => {
           <Route path='courses' element={<Courses />}></Route>
           <Route path='courses/create' element={<AddCourses />}></Route>
           <Route path='courses/:courseId' element={<EditCourse />}></Route>
+          <Route path='courses/:courseId/lecture' element={<AddLectures />}></Route>
         </Route>
       </Routes>
 

@@ -1,13 +1,13 @@
 import React, { useState, useEffect } from 'react'
 import { Link, useNavigate, useParams } from 'react-router-dom'
 import TextEditor from '../../../components/TextEditor'
-import { useEditCourseMutation } from '../../../features/api/courseApi'
+import { useEditCourseMutation, useGetSingleCourseQuery } from '../../../features/api/courseApi'
 import { toast } from 'react-toastify'
 
 
 const EditCourse = () => {
 
-    const loading = false
+
     const [input, setInput] = useState({
         courseTitle: "",
         subTitle: "",
@@ -49,6 +49,7 @@ const EditCourse = () => {
     }
 
     const [editCourse, { data, error, isLoading, isSuccess }] = useEditCourseMutation()
+    const { data: courseByIdData } = useGetSingleCourseQuery(courseId, { refetchOnMountOrArgChange: true })
 
     const submitEditForm = async () => {
         const formData = new FormData();
@@ -64,22 +65,42 @@ const EditCourse = () => {
         await editCourse({ formData, courseId })
     }
 
+
+    useEffect(() => {
+        if (courseByIdData?.course) {
+            const course = courseByIdData.course;
+            setInput({
+                courseTitle: course.courseTitle,
+                subTitle: course.subTitle,
+                category: course.category,
+                description: course.description,
+                courseLevel: course.courseLevel,
+                coursePrice: course.coursePrice,
+                courseThumbnail: '',
+            });
+        }
+    }, [courseByIdData]);
+
+
     useEffect(() => {
         if (isSuccess) {
             toast.success(data.messasge || 'Course Updated')
+            navigate('/admin/courses')
         }
-        // if (error) {
-        //     toast.error(error.data.messasge || "Error")
-        // }
+        if (error) {
+            toast.error(error.data.messasge || "Error")
+        }
 
     }, [isSuccess, error])
+
+
     return (
         <div className="container">
             <div className="row">
                 <div className="col-md-12">
                     <div className="d-flex align-items-center justify-content-between">
                         <h1 className='fs-3'>Add Detail Information Regarding Course</h1>
-                        <Link className='btn btn-primary'>Go To Lecture Page</Link>
+                        <Link className='btn btn-primary' to={`/admin/courses/${courseId}/lecture`}>Go To Lecture Page</Link>
                     </div>
                     <div className="card rounded-3 p-3 shadow-none border mt-4">
                         <div className="card-body">
@@ -154,7 +175,7 @@ const EditCourse = () => {
                             <div>
                                 <button onClick={() => navigate('/admin/courses')} className='btn btn-danger'>Cancel</button>
                                 <button onClick={submitEditForm} className='btn btn-primary ms-2'>
-                                    {loading ? (
+                                    {isLoading ? (
                                         <>
                                             <span className="spinner-border spinner-border-sm" aria-hidden="true"></span>
                                             <span role="status" className="ms-2">Saving...</span>

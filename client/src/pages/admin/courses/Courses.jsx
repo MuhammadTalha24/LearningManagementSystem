@@ -30,7 +30,7 @@ const Courses = () => {
                                         <tr className='align-middle' key={course._id}>
 
                                             <td>{course?.courseTitle}</td>
-                                            <td>{course?.price || 'NA'}</td>
+                                            <td>Rs.{course?.coursePrice || 'NA'}</td>
                                             <td>
                                                 <span className={course.isPublished ? 'badge bg-success' : 'badge bg-danger'}>
                                                     {course.isPublished ? "Published" : "Not Published"}
