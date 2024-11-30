@@ -1,6 +1,6 @@
 import { Course } from "../schema/course.model.js";
 import { Lecture } from '../schema/lecture.model.js'
-import { deleteMediaFromCloudinary, mediaUpload } from "../utils/cloudinary.js";
+import { deleteMediaFromCloudinary, deleteVideoFromCloudinary, mediaUpload } from "../utils/cloudinary.js";
 
 export const createCourse = async (req, res) => {
     try {
@@ -187,3 +187,117 @@ export const createLecture = async (req, res) => {
         });
     }
 };
+
+
+
+export const getLecture = async (req, res) => {
+    try {
+
+        const id = req.params.id;
+        const course = await Course.findById(id).populate("lectures");
+
+        if (!course) {
+            return res.status(400).json({
+                success: false,
+                message: "Course Not Found"
+            })
+        }
+
+        return res.status(200).json({
+            success: true,
+            lectures: course.lectures
+        })
+
+    } catch (error) {
+        return res.status(500).json({
+            success: false,
+            message: error.message || "Internal Server Error",
+        });
+    }
+}
+
+
+export const editLecture = async (req, res) => {
+    try {
+        const { lectureTitle, videoInfo, isPreviewFree } = req.body;
+        const { courseId, lectureId } = req.params
+        const lecture = await Lecture.findById(lectureId)
+        if (!lecture) {
+            return res.status(400).json({ message: "Lecture Not Found", success: false })
+        }
+
+        if (lectureTitle) lecture.lectureTitle = lectureTitle
+        if (videoInfo.videoUrl) lecture.videoUrl = videoInfo.videoUrl
+        if (videoInfo.publicId) lecture.publicId = videoInfo.publicId
+        if (isPreviewFree) lecture.isPreviewFree = isPreviewFree
+
+        await lecture.save();
+
+        return res.status(200).json({
+            success: true,
+            lecture,
+            message: "Lecture Updated Successfully"
+        })
+    } catch (error) {
+        return res.status(500).json({
+            success: false,
+            message: "Internal Server Error"
+        })
+    }
+}
+
+
+export const removeLecture = async (req, res) => {
+    try {
+        const { lectureId } = req.params
+        const lecture = await Lecture.findByIdAndDelete(lectureId)
+        if (!lecture) {
+            return res.status(400).json({
+                success: false,
+                message: "Lecture Not Found"
+            })
+        }
+
+
+        if (lecture.publicId) {
+            await deleteVideoFromCloudinary(lecture.publicId)
+        }
+
+        await Course.updateOne(
+            { lectures: lectureId },
+            { $pull: { lectures: lectureId } }
+        )
+
+
+        return res.status(200).json({
+            success: true,
+            message: "Lecture Removed Successfully"
+        })
+    } catch (error) {
+        return res.status(500).json({
+            success: false,
+            message: "Internal Server Error"
+        })
+    }
+}
+
+
+export const getLectureById = async (req, res) => {
+    try {
+        const { lectureId } = req.params
+        const lecture = await findById(lectureId)
+        if (!lecture) {
+            return res.status(400).json({
+                success: false,
+                message: "Lecture Not Found"
+            })
+        }
+
+        return res.status(200).json({
+            success: true,
+            lecture
+        })
+    } catch (error) {
+
+    }
+}

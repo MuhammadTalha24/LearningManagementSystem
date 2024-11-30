@@ -5,7 +5,7 @@ import cookieParser from 'cookie-parser'
 import cors from 'cors'
 import env from 'dotenv';
 import courseRoutes from './routes/course.routes.js'
-
+import mediaRoutes from './routes/media.routes.js'
 env.config();
 const app = express()
 
@@ -19,7 +19,7 @@ app.use(cors({
     credentials: true
 }));
 
-
+app.use('/api/media', mediaRoutes)
 app.use('/api/user', userRoutes);
 app.use('/api/course', courseRoutes);
 
