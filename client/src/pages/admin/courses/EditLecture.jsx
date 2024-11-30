@@ -1,13 +1,16 @@
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import { Link, useParams } from 'react-router-dom'
 import { toast } from 'react-toastify'
 import axios from 'axios'
+import { useEditLectureMutation, useRemoveLectureMutation } from '../../../features/api/courseApi'
 const EditLecture = () => {
     const params = useParams()
     const courseid = params.courseId;
+    const { lectureId } = params
 
-    const [title, setTitle] = useState('')
-    const [uploadVideoInfo, setUploadVideoInfo] = useState(null)
+
+    const [lectureTitle, setLectureTitle] = useState('')
+    const [videoInfo, setVideoInfo] = useState(null)
     const [isPreviewFree, setIsPreviewFree] = useState(false)
     const [mediaProgress, setMediaProgress] = useState(false)
     const [uploadProgress, setUploadProgress] = useState(0)
@@ -26,8 +29,8 @@ const EditLecture = () => {
                     }
                 })
                 if (res.data.success) {
-                    console.log(res)
-                    setUploadVideoInfo({ videoUrl: res.data.data.url, publicId: res.data.data.public_id })
+
+                    setVideoInfo({ videoUrl: res.data.data.url, publicId: res.data.data.public_id })
                     setBtnDisable(false)
                     toast.success("File Uploaded")
                 }
@@ -39,6 +42,40 @@ const EditLecture = () => {
             }
         }
     }
+
+    const [editLecture, { data, isSuccess, error, isLoading }] = useEditLectureMutation()
+    const [removeLecture, { data: removeData, isSuccess: removeSuccess, error: removeError }] = useRemoveLectureMutation();
+
+
+    const updateLecture = async () => {
+        await editLecture({ lectureTitle, isPreviewFree, videoInfo, lectureId })
+    }
+
+    useEffect(() => {
+        if (isSuccess) {
+            toast.success(data.message || 'Lecture Created')
+        }
+        if (error) {
+            toast.error(error.data.message || "Error In Editing")
+        }
+    }, [isSuccess, error])
+
+
+    const removeLectureHandler = async () => {
+        await removeLecture(lectureId)
+    }
+
+    useEffect(() => {
+        if (removeSuccess) {
+            toast.success(removeData.message || "Lecture Deleted")
+        }
+        if (removeError) {
+            toast.error(removeError.data.message || "Error In Deletion")
+        }
+    }, [removeSuccess, removeError])
+
+
+
     return (
         <div className="container">
             <div className="row">
@@ -49,13 +86,13 @@ const EditLecture = () => {
 
                         <div className="card mt-3">
                             <div className="card-body">
-                                <button className='btn btn-danger mb-3'>Remove Lecture</button>
+                                <button className='btn btn-danger mb-3' onClick={removeLectureHandler}>Remove Lecture</button>
                                 <div className="mb-3">
                                     <label htmlFor="" className='form-label'>Title</label>
-                                    <input type="text" name="" id="" className='form-control' />
+                                    <input onChange={(e) => setLectureTitle(e.target.value)} value={lectureTitle} type="text" name="" id="" className='form-control' />
                                 </div>
                                 <div class="form-check form-switch">
-                                    <input class="form-check-input" type="checkbox" role="switch" id="flexSwitchCheckDefault" />
+                                    <input value={isPreviewFree} onChange={(e) => setIsPreviewFree(e.target.checked)} class="form-check-input" type="checkbox" role="switch" id="flexSwitchCheckDefault" />
                                     <label class="form-check-label" for="flexSwitchCheckDefault">is this lecture is free?</label>
                                 </div>
                                 <div className='mt-3'>
@@ -81,7 +118,7 @@ const EditLecture = () => {
                                     )
                                 }
 
-                                <button className='mt-3 btn btn-primary'>Update Lecture</button>
+                                <button className='mt-3 btn btn-primary' onClick={updateLecture}>Update Lecture</button>
                             </div>
                         </div>
                     </div>

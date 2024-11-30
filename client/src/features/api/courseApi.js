@@ -50,9 +50,22 @@ export const courseApi = createApi({
                 url: `${id}/lectures`,
                 method: "GET",
             })
+        }),
+        editLecture: builder.mutation({
+            query: ({ lectureTitle, isPreviewFree, videoInfo, lectureId }) => ({
+                url: `lecture/${lectureId}`,
+                method: "PUT",
+                body: { lectureTitle, isPreviewFree, videoInfo }
+            })
+        }),
+        removeLecture: builder.mutation({
+            query: (lectureId) => ({
+                url: `lecture/${lectureId}`,
+                method: "DELETE"
+            })
         })
     })
 })
 
 
-export const { useCreateCourseMutation, useGetCreatorCoursesQuery, useEditCourseMutation, useGetSingleCourseQuery, useCreateLectureMutation, useGetLecturesQuery } = courseApi; 
+export const { useCreateCourseMutation, useGetCreatorCoursesQuery, useEditCourseMutation, useGetSingleCourseQuery, useCreateLectureMutation, useGetLecturesQuery, useEditLectureMutation, useRemoveLectureMutation } = courseApi; 

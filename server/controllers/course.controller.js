@@ -220,7 +220,7 @@ export const getLecture = async (req, res) => {
 export const editLecture = async (req, res) => {
     try {
         const { lectureTitle, videoInfo, isPreviewFree } = req.body;
-        const { courseId, lectureId } = req.params
+        const { lectureId } = req.params
         const lecture = await Lecture.findById(lectureId)
         if (!lecture) {
             return res.status(400).json({ message: "Lecture Not Found", success: false })
@@ -298,6 +298,9 @@ export const getLectureById = async (req, res) => {
             lecture
         })
     } catch (error) {
-
+        return res.status(500).json({
+            success: false,
+            message: "Internal Server Error"
+        })
     }
 }
